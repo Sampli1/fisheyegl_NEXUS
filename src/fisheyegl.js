@@ -198,6 +198,7 @@ var FisheyeGl = function FisheyeGl(options){
       )
     });
     img.src = url;
+    img.crossOrigin = "anonymous"
     return texture;
   }
 
@@ -265,6 +266,11 @@ var FisheyeGl = function FisheyeGl(options){
   var texture;
 
   function setImage(imageUrl, callback) {
+      if (texture) {
+        gl.deleteTexture(texture);
+      }
+
+
     texture = loadImageFromUrl(gl, imageUrl, function onImageLoad() {
 
       run(options.animate, callback);
@@ -290,6 +296,18 @@ var FisheyeGl = function FisheyeGl(options){
     return gl.canvas.toDataURL(format || 'image/jpeg');
 
   }
+
+  function updateTexture(imageUrl) {
+    var img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = function () {
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+      gl.bindTexture(gl.TEXTURE_2D, null);
+    };
+    img.src = imageUrl;
+}
+
 
   // external API:
   var distorter = {

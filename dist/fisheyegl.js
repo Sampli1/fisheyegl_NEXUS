@@ -189,6 +189,7 @@ var FisheyeGl = function FisheyeGl(options){
   function loadImageFromUrl(gl, url, callback){
     var texture = gl.createTexture();
     var img = new Image();
+    img.crossOrigin = "anonymous"
     img.addEventListener("load", function onload(){
       loadImage(gl, img, callback, texture);
       options.width = img.width;
@@ -266,12 +267,27 @@ var FisheyeGl = function FisheyeGl(options){
   var texture;
 
   function setImage(imageUrl, callback) {
+    if (texture) {
+        gl.deleteTexture(texture);
+    }
+
     texture = loadImageFromUrl(gl, imageUrl, function onImageLoad() {
 
       run(options.animate, callback);
 
     });
   }
+
+  function updateTexture(imageUrl) {
+  var img = new Image();
+  img.crossOrigin = "anonymous";
+  img.onload = function () {
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+    gl.bindTexture(gl.TEXTURE_2D, null);
+  };
+  img.src = imageUrl;
+}
 
   setImage(image);
 
